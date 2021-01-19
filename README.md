@@ -9,7 +9,7 @@ TODO before use:
 Important: Since OpenGL Viewer has to be used for RecordedCamera, the scene probably has to be loaded once with line 18 (add Controller) commented out before changing the viewer. 
 When changing to OpenGL first and then loading the scene the lighting of the object might be flawed (at least with my current version of sofa). Once the controller is loaded you cannot reload it since Matlab engine won't work anymore - so atm I completely quit sofa and go through this whole process again after trying the scene once which is pretty annoying and inefficient -> Working on a fix.
 
-workflow: load scene with controller commented out -> change viewer -> uncomment line 18 -> reload scene (cmd+'r')
+workflow: load scene with controller commented out -> change viewer -> uncomment line 18 -> reload scene (cmd+'r') -> start animate ->  cmd+'a' to start/stop SLAM 
 
 Everything else should work right off the bat. 
 Regarding possible error in line 3 (estimateGeometricTransform2D) of "helperFunctions/helperComputeHomography.m": This function was added in MATLAB 2020b so mat.engine for 2020b has to be used.
