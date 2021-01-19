@@ -3,6 +3,7 @@
 Contains Matlab Code for ORB SLAM + Sofa scene using RecordedCamera component to generate screenshots
 TODO before use:
 1. change self.sequenceDIR (line 28, CameraControllerORB.py) to your sofa screenshot directory
+
 Everything else should work right off the bat. 
 Regarding possible error in line 3 (estimateGeometricTransform2D) of "helperFunctions/helperComputeHomography.m": This function was added in MATLAB 2020b so mat.engine for 2020b has to be used
 More information about this: https://de.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
