@@ -1,5 +1,5 @@
 %% Initalization of image folder
-addpath 'helperFunctions' 'initialization_steps'
+addpath 'helperFunctions' 'initialization_steps' 'groundTruth'
 imageFolder = '/Users/jona/sofa/build/screenshots/';
 imagePrefix = 'RecordedCameraPython_';
 imageSequence = [imageFolder, imagePrefix];
@@ -14,6 +14,9 @@ currFrameIdx = initIm;
 % currI = readimage(imds, currFrameIdx);
 currI = takeImage(imageSequence,currFrameIdx);
 % himage = imshow(currI);
+
+%% Load camera intrinsics
+camera_initialization
 
 %% Map initialization
 map_initialization
@@ -39,6 +42,6 @@ refKeyFrameId     = currViewId;
 lastKeyFrameIdx   = currFrameIdx - 1; 
 
 % Indices of all the key frames in the input image sequence
-addedFramesIdx    = [1; lastKeyFrameIdx];
+addedFramesIdx    = [initIm; lastKeyFrameIdx];
 
 isLoopClosed      = false;
