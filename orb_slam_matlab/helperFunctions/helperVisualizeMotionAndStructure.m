@@ -12,11 +12,11 @@ classdef helperVisualizeMotionAndStructure < handle
 %         YLim = [-2 1]
 %         
 %         ZLim = [-1 3]
-        XLim = [-15 15]
+        XLim = [-2 2]
         
-        YLim = [-15 15]
+        YLim = [-2 2]
         
-        ZLim = [-15 15]
+        ZLim = [-1 3]
         
         Axes
     end
