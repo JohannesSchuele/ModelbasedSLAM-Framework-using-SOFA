@@ -16,9 +16,22 @@ Regarding possible error in line 3 (estimateGeometricTransform2D) of "helperFunc
 More information about this: https://de.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
 
 Improvements TODO:
-1. change focalLength and principalPoint (camera intrinsics) according to calibration (only change if mapping does not work) -> update calibration??
-2. change camera trajectory and generate ground truth from sofa
-3. test deformation of body in sofa, add mechanical properties
-4. test transformation of map (translation etc.) / accessability of worldPointSet
-5. improve body / texture
-6. Fix matlab engine problem
+1. test deformation of body in sofa, add mechanical properties, force
+2. test transformation of map (translation etc.) / accessability of worldPointSet
+3. improve body / texture
+4. Fix matlab engine problem
+5. comment/document code
+6. export mesh from sofa: vtk exporter, monitor, state exporter
+7. SLAM tuning parameters?? keyFrameDetection, fps,...
+8. add NavigationRecordedCameraScene for different movement
+9. add option to save sequence, groundTruth and map together at the end
+
+UPDATE 29/01/2021:
+1. updated camera calibration, should now work better
+2. added comments
+3. self.lowerQualityImmediately lets you decide whether to lower image quality/size at the end of the process (after finishing slam) or at each step-> speeds things up quite a bit but takes very long at the end. If you just want to test stuff it is best to leave it at 0 and comment out the stuff at the end
+4. added sofa ground truth, also scales the map
+5. changed rotation of recordedCamera, now starts at (0,0,0) facing in z-direction. Same starting position as SLAM
+6. "real" camera (in sofa) and tracked camera (slam) are now in sync due to 4. and 5. (dimensions, axis,...) 
+7. extension of 6.: added automatic SLAM start when starting the animation/simulation in sofa. cmd+'a' still stops SLAM and evaluates ground truth (see orb_slam_matlab/groundTruthcompareGroundTruth.m)
+8. added example sequence and corresponding ground truth in 'example', you can test this with slam_whole_in_one.m

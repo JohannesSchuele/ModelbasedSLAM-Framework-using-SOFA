@@ -7,16 +7,21 @@ classdef helperVisualizeMotionAndStructure < handle
 %   Copyright 2019-2020 The MathWorks, Inc.
 
     properties
-        XLim = [-5 5]
+%         XLim = [-1 1]
+%         
+%         YLim = [-2 1]
+%         
+%         ZLim = [-1 3]
+        XLim = [-15 15]
         
-        YLim = [-5 5]
+        YLim = [-15 15]
         
-        ZLim = [-5 5]
+        ZLim = [-15 15]
         
         Axes
     end
     
-    properties (Access = private)
+    properties (Access = public)
         MapPointsPlot
  
         EstimatedTrajectory
@@ -83,6 +88,21 @@ classdef helperVisualizeMotionAndStructure < handle
         function plotActualTrajectory(obj, gTruth, optimizedPoses)
             estimatedCams = vertcat(optimizedPoses.AbsolutePose.Translation);
             actualCams    = vertcat(gTruth.Translation);
+            scale = median(vecnorm(actualCams, 2, 2))/ median(vecnorm(estimatedCams, 2, 2));
+            
+            % Update the plot based on the ground truth
+            updatePlotScale(obj, scale);
+            
+            % Plot the ground truth
+            plot3(obj.Axes, actualCams(:,1), actualCams(:,2), actualCams(:,3), ...
+                'g','LineWidth',2, 'DisplayName', 'Actual trajectory');
+            
+            drawnow limitrate
+        end
+        
+        function tweaked_plotActualTrajectory(obj, gTruth, optimizedPoses)
+            estimatedCams = vertcat(optimizedPoses.AbsolutePose.Translation);
+            actualCams    = gTruth;
             scale = median(vecnorm(actualCams, 2, 2))/ median(vecnorm(estimatedCams, 2, 2));
             
             % Update the plot based on the ground truth

@@ -1,7 +1,8 @@
 %% Initalization of image folder
 clear all; close all;
 addpath 'helperFunctions'
-imageFolder   = '/Users/jona/sofa/build/screenshots/';
+% imageFolder   = '/Users/jona/sofa/build/screenshots/';
+imageFolder = 'example/sequence';
 imds          = imageDatastore(imageFolder);
 
 % Inspect the first image
@@ -19,14 +20,20 @@ rng(0);
 % https://vision.in.tum.de/data/datasets/rgbd-dataset/file_formats
 % Note that the images in the dataset are already undistorted, hence there
 % is no need to specify the distortion coefficients.
-nRows = 1200;
-nCols = 1530;
-Cx =    734.8202;
-Cy =    640.9961;
-f =     2.1735;
-d =     0.0112;
-focalLength    = [f/d, f/d];    % in units of pixels
-principalPoint = [Cx, Cy];    % in units of pixels
+% nRows = 1200;
+% nCols = 1530;
+% Cx =    734.8202;
+% Cy =    640.9961;
+% f =     2.1735;
+% d =     0.0112;
+% focalLength    = [f/d, f/d];    % in units of pixels
+% principalPoint = [Cx, Cy];    % in units of pixels
+% imageSize      = size(currI,[1 2]);  % in units of pixels
+% intrinsics     = cameraIntrinsics(focalLength, principalPoint, imageSize);
+
+load initialization_steps/cameraParams_2401
+focalLength = cameraParams.FocalLength;
+principalPoint = cameraParams.PrincipalPoint;
 imageSize      = size(currI,[1 2]);  % in units of pixels
 intrinsics     = cameraIntrinsics(focalLength, principalPoint, imageSize);
 
@@ -220,7 +227,7 @@ addedFramesIdx    = [1; lastKeyFrameIdx];
 isLoopClosed      = false;
 
 % Main loop
-while ~isLoopClosed && currFrameIdx < numel(imds.Files)  
+while ~isLoopClosed && currFrameIdx < numel(imds.Files)
     currI = readimage(imds, currFrameIdx);
 
     [currFeatures, currPoints] = helperDetectAndExtractFeatures(currI, scaleFactor, numLevels, intrinsics);
@@ -340,3 +347,14 @@ plotOptimizedTrajectory(mapPlot, optimizedPoses)
 
 % Update legend
 showLegend(mapPlot);
+
+%% Compare ground truth 
+load 'example/sofaGroundTruth.mat'
+% Plot the actual camera trajectory 
+tweaked_plotActualTrajectory(mapPlot, sofaGroundTruth_trans, optimizedPoses);
+
+% Show legend
+showLegend(mapPlot);
+
+% Evaluate tracking accuracy
+tweaked_helperEstimateTrajectoryError(sofaGroundTruth_trans, optimizedPoses);
