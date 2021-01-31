@@ -20,11 +20,9 @@ Improvements TODO:
 2. test transformation of map (translation etc.) / accessability of worldPointSet
 3. improve body / texture
 4. Fix matlab engine problem
-5. comment/document code
-6. export mesh from sofa: vtk exporter, monitor, state exporter
-7. SLAM tuning parameters?? keyFrameDetection, fps,...
-8. add NavigationRecordedCameraScene for different movement
-9. add option to save sequence, groundTruth and map together at the end
+5. export mesh from sofa: vtk exporter, monitor, state exporter
+6. add NavigationRecordedCameraScene for different movement
+7. add option to save sequence, groundTruth and map together at the end
 
 UPDATE 29/01/2021:
 1. updated camera calibration, should now work better
@@ -35,3 +33,12 @@ UPDATE 29/01/2021:
 6. "real" camera (in sofa) and tracked camera (slam) are now in sync due to 4. and 5. (dimensions, axis,...) 
 7. extension of 6.: added automatic SLAM start when starting the animation/simulation in sofa. cmd+'a' still stops SLAM and evaluates ground truth (see orb_slam_matlab/groundTruthcompareGroundTruth.m)
 8. added example sequence and corresponding ground truth in 'example', you can test this with slam_whole_in_one.m
+
+Tuning parameters SLAM:
+1. fps/movement velocity
+2. helperIsKeyFrame: 
+    - minimum number of frames that have to pass before new keyFrame is allowed
+    - minimum number of map points
+    - tracked points ratio between current frame and last keyFrame
+    -> obviously more keyFrames "=" more accuracy but also more expensive computationally, thus slower
+
