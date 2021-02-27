@@ -26,7 +26,7 @@ class SofaSim(QObject):
         self.root = SCore.Node("Root")
         root = self.root
         root.gravity = [0, 0, 0]
-        root.addObject("VisualStyle", displayFlags="showVisual")
+        root.addObject("VisualStyle", displayFlags="showVisual showAll")
         root.addObject("MeshGmshLoader", name="meshGmsh",
                        filename="../mesh/blender_ellipsoid.msh")
 #        root.addObject("MeshSTLLoader", name="meshSTL",
@@ -58,7 +58,7 @@ class SofaSim(QObject):
                         poissonRatio="0.4", method="large")
 
         ellipsoid.addObject("MeshMatrixMass", massDensity="1")
-        ellipsoid.addObject("BoxROI", name='boxROI_fix', box='-1.5 -1.5 4.5 1.5 1.5 5.5', drawBoxes=True)
+        ellipsoid.addObject("BoxROI", name='boxROI_fix', box='-1.5 -1.5 -0.5 1.5 1.5 0.5', drawBoxes=True)
         ellipsoid.addObject("FixedConstraint",  name="FixedConstraint", indices="@boxROI_fix.indices")
         # Visual
         visual = ellipsoid.addChild("visual")
@@ -74,6 +74,9 @@ class SofaSim(QObject):
         # collision.addObject('Line',selfCollision="false")
         # collision.addObject('Point', selfCollision="false")
         collision.addObject('BarycentricMapping', input="@..", output="@collisMech", name="visual mapping")
+
+        ellipsoid.addObject('BoxROI', name='boxROI', box='-0.1 0.3 0.5 1.0 1.5 1.5', drawBoxes=True)
+        ellipsoid.addObject('ConstantForceField', name="CFF", indices=[1], forces=[0,0,0], showArrowSize="0.01")
 
         # place light and a camera
         self.root.addObject("LightManager")

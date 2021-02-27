@@ -7,7 +7,7 @@ import os
 import math
 #path = os.path.dirname(os.path.abspath(__file__))+'/mesh/'
 
-from CameraControllerP3 import controller
+#from CameraControllerP3 import controller
 
 def createScene(rootNode):
 #                Sofa.Gui.GUIManager.Init("simple_scene", "qtviewer")
@@ -33,7 +33,7 @@ def createScene(rootNode):
                                     cameraUp=[0, -1, 0])
                                     
 
-                rootNode.addObject(controller(name="CameraController", node=rootNode))
+#                rootNode.addObject(controller(name="CameraController", node=rootNode))
 
 
 
@@ -91,7 +91,7 @@ def createScene(rootNode):
                 forces = []
                 # fix hard code -> number of indices in boxROI
                 for i in range(1,29):
-                    forces.append([0,0,0])
-                ellipsoid.addObject('ConstantForceField', name="CFF", indices="@boxROI.indices", forces=forces, showArrowSize=0.01)
+                    forces.append([0,0,10])
+                ellipsoid.addObject('ConstantForceField', name="CFF", indices="@boxROI.indices", forces=forces, showArrowSize=0.1)
             
                 return rootNode

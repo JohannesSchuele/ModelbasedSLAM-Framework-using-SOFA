@@ -16,8 +16,6 @@ class controller(Sofa.PythonScriptController):
     def initGraph(self, node):
         self.node = node
         self.object = self.node.getChild('ellipsoid')
-#        self.object.createObject('BoxROI', name='boxROI', box='-0.1 0.3 3.5 1.0 1.5 4.5', drawBoxes=True)
-#        print(len(self.forces.value))
         self.totalTime = 0.0
         
     def onEndAnimationStep(self, dt):

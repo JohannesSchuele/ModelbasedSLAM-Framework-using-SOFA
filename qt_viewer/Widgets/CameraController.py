@@ -13,10 +13,13 @@ class controller(Sofa.Core.Controller):
         self.node = kwargs.get("node")
         self.camera = self.node.camera
         self.totalTime = 0.0
-
+        self.object = self.node.getChild('ellipsoid')
+        self.startForce = 0
+        self.endForce = 50
+        self.startTime = 2
+        self.endTime = 15
 
     def onAnimateEndEvent(self, event):
-
         self.totalTime += event['dt']
         if self.totalTime <= 1:
             self.node.camera.position += [0., 0.01, 0.]
@@ -30,6 +33,20 @@ class controller(Sofa.Core.Controller):
             self.node.camera.position += [0., 0.01, 0.]
         elif self.totalTime <= 8:
             self.node.camera.position += [0.01, 0., 0.]
+            
+
+        if self.totalTime >= self.startTime and self.totalTime <= self.endTime:
+            n = len(self.object.boxROI.findData("indices").value)
+            forces = []
+            xForce = self.startForce + (self.endForce-self.startForce) * (self.totalTime-self.startTime)/(self.endTime-self.startTime)
+            yForce = self.startForce + (self.endForce-self.startForce) * (self.totalTime-self.startTime)/(self.endTime-self.startTime)
+            zForce = self.startForce + (self.endForce-self.startForce) * (self.totalTime-self.startTime)/(self.endTime-self.startTime)
+            for i in range(1,n+1):
+                forces.append([xForce,yForce,zForce])
+            self.object.CFF.findData('indices').value = self.object.boxROI.findData("indices").value
+            self.object.CFF.findData('forces').value = forces
+        
+
 
 #    def onKeypressedEvent(self, event):
 

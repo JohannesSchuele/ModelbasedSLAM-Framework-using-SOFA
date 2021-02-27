@@ -155,5 +155,4 @@ class SofaGLViewer(QOpenGLWidget):
     
     def get_viewer_size(self):
         _, _, width, height = glGetIntegerv(GL_VIEWPORT)
-        # return self.width(), self.height()
         return width, height

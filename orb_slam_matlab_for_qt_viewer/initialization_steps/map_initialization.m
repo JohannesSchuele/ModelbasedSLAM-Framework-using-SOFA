@@ -77,7 +77,7 @@ while ~isMapInitialized && currFrameIdx < numberOfInitialImages
     
     isMapInitialized = true;
     
-    disp(['Map initialized with frame', num2str(initIm),'and frame ', num2str(currFrameIdx-1)])
+%     disp(['Map initialized with frame', num2str(initIm),'and frame ', num2str(currFrameIdx-1)])
 end % End of map initialization loop
 
 % Check map initialization

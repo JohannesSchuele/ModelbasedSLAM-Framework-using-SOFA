@@ -13,3 +13,6 @@
 --- NEW SESSION: 21/02/2021 22:37:02 ---
 //camera.position = 0 0 0
 //camera.orientation = 0 0 0 1
+
+--- NEW SESSION: 26/02/2021 18:54:49 ---
+/ellipsoid/CFF.showColor = 0.2 0.898039 0.298039 1
