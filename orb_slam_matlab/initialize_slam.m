@@ -1,6 +1,7 @@
 %% Initalization of image folder
 addpath 'helperFunctions' 'initialization_steps' 'groundTruth'
-imageFolder = '/Users/jona/sofa/build/screenshots/';
+% imageFolder = '/Users/jona/sofa/build/screenshots/';
+% imageFolder = '/Users/jona/sofa_20.12/build_20.12/install/screenshots/';
 imagePrefix = 'RecordedCameraPython_';
 imageSequence = [imageFolder, imagePrefix];
 % imds = imageDatastore(firstFile);
