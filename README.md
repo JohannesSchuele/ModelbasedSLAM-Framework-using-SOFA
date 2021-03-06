@@ -25,15 +25,12 @@
  2. test transformation of map (translation etc.) / accessability of worldPointSet
  3. improve body / texture
  4. export mesh from sofa: vtk exporter, monitor, state exporter
- 5. add option to save sequence, groundTruth and map together at the end
- 
- 
- 
+ 5. add option to save sequence, groundTruth and map together at the end 
  
  
  
 OLD STUFF:
- 
+ -
  
 Contains Matlab Code for ORB SLAM + Sofa scene using RecordedCamera component to generate screenshots.
 TODO before use:
