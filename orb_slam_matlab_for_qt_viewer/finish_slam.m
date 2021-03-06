@@ -16,4 +16,4 @@ plotOptimizedTrajectory(mapPlot, optimizedPoses)
 showLegend(mapPlot);
 
 % % Use ground truth so compare/optimize trajectory and calculate error
-% compareGroundTruth
+compareGroundTruth

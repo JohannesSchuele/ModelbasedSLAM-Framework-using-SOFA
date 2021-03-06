@@ -26,7 +26,7 @@ class SofaSim(QObject):
         self.root = SCore.Node("Root")
         root = self.root
         root.gravity = [0, 0, 0]
-        root.addObject("VisualStyle", displayFlags="showVisual showAll")
+        root.addObject("VisualStyle", displayFlags="showVisual")
         root.addObject("MeshGmshLoader", name="meshGmsh",
                        filename="../mesh/blender_ellipsoid.msh")
 #        root.addObject("MeshSTLLoader", name="meshSTL",
@@ -81,9 +81,11 @@ class SofaSim(QObject):
         # place light and a camera
         self.root.addObject("LightManager")
         self.root.addObject("DirectionalLight", direction=[0, 1, 1])
+        self.root.addObject("DirectionalLight", direction=[0, -1, -1])
         self.root.addObject("InteractiveCamera", name="camera", position=[0, 0, 5],
                             lookAt=[0, 0, 0], distance=5,
                             fieldOfView=45, zNear=0.160738, zFar=20)
+        #?????? so strange
                             
         # add controller
         self.root.addObject(controller(name="CameraController", node=root))

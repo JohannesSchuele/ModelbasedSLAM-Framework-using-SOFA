@@ -27,7 +27,6 @@ currI = uint8(currI);
 %    points tracked by the reference key frame
 isKeyFrame = helperIsKeyFrame(mapPointSet, refKeyFrameId, lastKeyFrameIdx, ...
     currFrameIdx, mapPointsIdx);
-
 % Visualize matched features
 % updatePlot(featurePlot, currI, currPoints(featureIdx));
 
@@ -64,37 +63,38 @@ directionAndDepth = update(directionAndDepth, mapPointSet, vSetKeyFrames.Views, 
 updatePlot(mapPlot, vSetKeyFrames, mapPointSet);
 
 %% Loop Closure
-% % Initialize the loop closure database
-% if currKeyFrameId == 3
-%     % Load the bag of features data created offline
-%     bofData         = load('bagOfFeaturesData.mat');
-%     loopDatabase    = invertedImageIndex(bofData.bof);
-%     loopCandidates  = [1; 2];
-% 
-% % Check loop closure after some key frames have been created    
-% elseif currKeyFrameId > 20
-% 
-%     % Minimum number of feature matches of loop edges
-%     loopEdgeNumMatches = 50;
-% 
-%     % Detect possible loop closure key frame candidates
-%     [isDetected, validLoopCandidates] = helperCheckLoopClosure(vSetKeyFrames, currKeyFrameId, ...
-%         loopDatabase, currI, loopCandidates, loopEdgeNumMatches);
-% 
-%     if isDetected 
-%         % Add loop closure connections
-%         [isLoopClosed, mapPointSet, vSetKeyFrames] = helperAddLoopConnections(...
-%             mapPointSet, vSetKeyFrames, validLoopCandidates, currKeyFrameId, ...
-%             currFeatures, currPoints, intrinsics, scaleFactor, loopEdgeNumMatches);
-%     end
-% end
+% Initialize the loop closure database
+if currKeyFrameId == 3
+    % Load the bag of features data created offline
+    bofData         = load('bagOfFeaturesData.mat');
+    loopDatabase    = invertedImageIndex(bofData.bof);
+    loopCandidates  = [1; 2];
 
-% % If no loop closure is detected, add the image into the database
-% if ~isLoopClosed
-%     currds = imageDatastore(sprintf('%s%08d.png',imageSequence,currFrameIdx));
-%     addImages(loopDatabase, currds, 'Verbose', false);
-%     loopCandidates= [loopCandidates; currKeyFrameId]; 
-% end
+% Check loop closure after some key frames have been created    
+elseif currKeyFrameId > 20
+
+    % Minimum number of feature matches of loop edges
+    loopEdgeNumMatches = 50;
+
+    % Detect possible loop closure key frame candidates
+    [isDetected, validLoopCandidates] = helperCheckLoopClosure(vSetKeyFrames, currKeyFrameId, ...
+        loopDatabase, currI, loopCandidates, loopEdgeNumMatches);
+
+    if isDetected 
+        % Add loop closure connections
+        [isLoopClosed, mapPointSet, vSetKeyFrames] = helperAddLoopConnections(...
+            mapPointSet, vSetKeyFrames, validLoopCandidates, currKeyFrameId, ...
+            currFeatures, currPoints, intrinsics, scaleFactor, loopEdgeNumMatches);
+    end
+end
+% If no loop closure is detected, add the image into the database
+path = ['keyframes/frame_',num2str(currKeyFrameId),'.jpg'];
+imwrite(currI,path);
+if ~isLoopClosed
+    currds = imageDatastore(path);
+    addImages(loopDatabase, currds, 'Verbose', false);
+    loopCandidates= [loopCandidates; currKeyFrameId]; 
+end
 
 % Update IDs and indices
 lastKeyFrameId  = currKeyFrameId;

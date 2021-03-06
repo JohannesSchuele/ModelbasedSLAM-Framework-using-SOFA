@@ -1,6 +1,7 @@
 import Sofa
 import Sofa.Core
 from Sofa.constants import *
+import math
 
 
 
@@ -16,26 +17,14 @@ class controller(Sofa.Core.Controller):
         self.object = self.node.getChild('ellipsoid')
         self.startForce = 0
         self.endForce = 50
-        self.startTime = 2
+        self.startTime = 0
         self.endTime = 15
+        self.startForces = False
 
     def onAnimateEndEvent(self, event):
-        self.totalTime += event['dt']
-        if self.totalTime <= 1:
-            self.node.camera.position += [0., 0.01, 0.]
-        elif self.totalTime <= 2:
-            self.node.camera.position += [0.01, 0., 0.]
-        elif self.totalTime <= 4:
-            self.node.camera.position += [0., -0.01, 0.01]
-        elif self.totalTime <= 6:
-            self.node.camera.position += [-0.01, 0., -0.01]
-        elif self.totalTime <= 7:
-            self.node.camera.position += [0., 0.01, 0.]
-        elif self.totalTime <= 8:
-            self.node.camera.position += [0.01, 0., 0.]
+        self.totalTime += event['dt'] # dt = 0.01        
             
-
-        if self.totalTime >= self.startTime and self.totalTime <= self.endTime:
+        if self.startForces and self.totalTime <= self.endTime:
             n = len(self.object.boxROI.findData("indices").value)
             forces = []
             xForce = self.startForce + (self.endForce-self.startForce) * (self.totalTime-self.startTime)/(self.endTime-self.startTime)
@@ -48,7 +37,4 @@ class controller(Sofa.Core.Controller):
         
 
 
-#    def onKeypressedEvent(self, event):
-
-
-
+    # def onKeypressedEvent(self, event):

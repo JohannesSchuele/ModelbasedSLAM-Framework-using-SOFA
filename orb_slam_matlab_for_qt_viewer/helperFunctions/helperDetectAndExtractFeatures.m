@@ -6,10 +6,10 @@ numPoints   = 1000;
 % In this example, the images are already undistorted. In a general
 % workflow, uncomment the following code to undistort the images.
 
-% if nargin > 3
-%     intrinsics = varargin{1};
-% end
-% Irgb  = undistortImage(Irgb, intrinsics);
+if nargin > 3
+    intrinsics = varargin{1};
+end
+Irgb  = undistortImage(Irgb, intrinsics);
 
 % Detect ORB features
 Igray  = rgb2gray(Irgb);

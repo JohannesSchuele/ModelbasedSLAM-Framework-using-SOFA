@@ -9,14 +9,39 @@ from qtpy.QtCore import *
 from qtpy.QtWidgets import *
 import matlab.engine
 import numpy as np
-# from numpy.linalg import norm
 from scipy.io import savemat
 from .SofaGLViewer import SofaGLViewer
 from .SofaSim import SofaSim
+import csv
+import os
+import math
+
+def compute_trajectory(keypoints):
+    # get list of keytimes and corresponding positions/orientations
+    # returns np.arrays of complete trajectory, connecting all keypoints and reaching them at the specified times
+    key_times = np.array(keypoints)[:,0]
+    key_positions = np.array(keypoints)[:,1:4]
+    key_orientations = np.array(keypoints)[:,4:8]
+    end_time = int(key_times[-1])
+    positions = np.zeros([end_time+1,3])
+    orientations = np.zeros([end_time+1,4])
+    for i in range(len(key_times)-1):
+        time_0 = int(key_times[i])
+        time_1 = int(key_times[i+1])
+        pos_0 = key_positions[i,:]
+        pos_1 = key_positions[i+1,:]
+        ori_0 = key_orientations[i,:]
+        ori_1 = key_orientations[i+1,:]
+        time_n = np.arange(time_0, time_1+1)
+        time_n = time_n.reshape([time_1+1-time_0,1]) #else (time_1+1-time_0,)->multiplication not possible
+        positions[time_0:time_1+1,:] = (time_n-time_0) * (pos_1-pos_0)/(time_1-time_0) + pos_0
+        orientations[time_0:time_1+1,:] = (time_n-time_0) * (ori_1-ori_0)/(time_1-time_0) + ori_0
+        orientations = orientations / np.linalg.norm(orientations, axis=1, keepdims=True) 
+    return positions, orientations
 
 class EngineORB:
    
-    def __init__(self, mat_dir, n_init_images=10, skip_images_init = 0, skip_images_main = 2):   
+    def __init__(self, mat_dir, skip_images_init=2, skip_images_main=0, mode="fromfile", trajectory_path="./trajectories/test/"):   
         # print("starting matlab engine ...")
         # # Start matlab engine
         # self.mat = matlab.engine.start_matlab() #"-desktop -r 'format short'"
@@ -24,17 +49,57 @@ class EngineORB:
         self.mat = matlab.engine.connect_matlab() # share by running "matlab.engine.shareEngine" in matlab command prompt
         # Go to slam directory
         self.mat.cd(mat_dir, nargout=0)
-        self.n_init_images = n_init_images
+        self.mat_dir = mat_dir
         self.skip_images = skip_images_init
         self.skip_images_main = skip_images_main
         self.skip_counter = skip_images_init #start immediately
         self.is_mapping = False
         self.is_initialized = False
-        self.k = 0
-        self.step = 1
-        self.position = np.zeros(3)
-        self.orientation = np.zeros(4)
-        
+        self.slam_step = 0
+        self.sim_step = 0
+        self.positions = []
+        self.orientations = []
+        self.ground_truth_positions = np.zeros(shape=(100,3))
+        self.ground_truth_orientations = np.zeros(shape=(100,4))
+        self.mode = mode
+        self.trajectory_path = trajectory_path
+        if mode == "fromfile":
+            print("Reading camera trajectory")
+            with open(os.path.join(self.trajectory_path,"camera_positions.txt"), 'r') as f:
+                reader = csv.reader(f, delimiter=" ", quoting=csv.QUOTE_NONNUMERIC)
+                for row in reader:
+                    self.positions.append(list(row))
+            with open(os.path.join(self.trajectory_path,"camera_orientations.txt"), 'r') as f:
+                reader = csv.reader(f, delimiter=" ", quoting=csv.QUOTE_NONNUMERIC)
+                for row in reader:
+                    self.orientations.append(list(row))
+            #TODO funktioniert auch ohne np.array???
+            self.positions = np.array(self.positions)
+            self.orientations = np.array(self.orientations)
+            self.n_positions = self.positions.shape[0]
+            self.current_line = 0
+        elif mode == "tofile":
+            if not os.path.exists(trajectory_path):
+                os.makedirs(trajectory_path)
+                print("Directory created")
+            print("Trajectory will be written to " + trajectory_path + " when the simulation is stopped (space pressed)")
+            if self.trajectory_path == "./trajectories/navigation/":
+                print("Navigate to desired keypoint with arrow keys and 'wasd', then press H to add camera position to keypoint-list.")
+                self.keypoints = []
+        elif mode == "keypoint_navigation":
+            print("Reading camera trajectory keypoints and -times")
+            keypoints = []
+            with open(os.path.join("./trajectories/navigation/keypoints_test.txt"), 'r') as f:
+                reader = csv.reader(f, delimiter=" ", quoting=csv.QUOTE_NONNUMERIC)
+                for row in reader:
+                    keypoints.append(list(row))
+            self.positions, self.orientations = compute_trajectory(keypoints)
+            self.n_positions = self.positions.shape[0]
+            self.current_line = 0
+        keyframes_dir = os.path.join(self.mat_dir,"keyframes")
+        for f in os.listdir(keyframes_dir):
+            os.remove(os.path.join(keyframes_dir, f))
+            
     def set_viewer(self, viewer: SofaGLViewer):
         self.viewer = viewer
         self._viewer_set = True
@@ -49,78 +114,162 @@ class EngineORB:
     def set_sim(self, sim: SofaSim):
         self.sofa_sim = sim
         self._sim_set = True
+        
+    def update_sim_step(self):
+        #keep track of number of simulation steps
+        self.sim_step += 1
 
     def viewer_info(self, viewer_size, intrinsics):
         self.viewer_size = viewer_size
         self.intrinsics = intrinsics
-        # create an empty array to store all init_images
         self.width = self.viewer_size[0]
-        self.height = self.viewer_size[1] 
-        self.init_images = np.empty([self.height*self.n_init_images, self.width, 3])
-        
+        self.height = self.viewer_size[1]
+    
+    def add_pos_to_gt(self, row):
+        # add new row if predetermined size is not sufficient
+        if row < self.ground_truth_positions.shape[0]:
+            self.ground_truth_positions[row] = self.sofa_sim.root.camera.position.value
+            self.ground_truth_orientations[row] = self.sofa_sim.root.camera.orientation.value
+        else:
+            self.ground_truth_positions = np.vstack((self.ground_truth_positions,self.sofa_sim.root.camera.position.value))
+            self.ground_truth_orientations = np.vstack((self.ground_truth_orientations,self.sofa_sim.root.camera.orientation.value))
+    
     def initialize_slam(self, image):
-        self.k += 1
-        self.init_images[(self.k-1)*self.height:self.k*self.height,:,:] = image
-        if self.k == self.n_init_images:
-            # set stuff for matlab: n_init_images, init_images, focalLength, principalPoint, viewer_size
-            initdic = {"initImages": self.init_images,
-                    "numberOfInitialImages": self.n_init_images,
+        # use first image to initalize slam, then use every image to try to initialize the map
+        self.slam_step += 1
+        if self.slam_step == 1:
+            self.add_pos_to_gt(0) # save camera position corresponding to first initilization frame
+            # set stuff for matlab: init_image, focalLength, principalPoint, viewer_size
+            initdic = {"currI": image,
                     "focalLength": np.array([self.intrinsics[0],self.intrinsics[1]]),
                     "principalPoint": np.array([self.intrinsics[2],self.intrinsics[3]]),
                     "viewerWidth": self.width,
                     "viewerHeight": self.height}
-            savemat("../orb_slam_matlab_for_qt_viewer/initImages.mat", initdic)
-            # self.mat.workspace['initImages'] = self.matInitImages
-            # self.mat.workspace['numberOfInitialImages'] = self.n_init_images
-            # self.mat.workspace['focalLength'] = matlab.double(self.intrinsics[0:1])
-            # self.mat.workspace['principalPoint'] = matlab.double(self.intrinsics[2:3])
-            # self.mat.workspace['viewerWidth'] = self.width
-            # self.mat.workspace['viewerHeight'] = self.height 
+            savemat(os.path.join(self.mat_dir,"initI.mat"), initdic)
             self.mat.initialize_slam(nargout=0)
-            self.is_initialized = True
-            self.skip_images = self.skip_images_main
+        else:
+            initdic = {"currI": image}
+            savemat(os.path.join(self.mat_dir,"currI.mat"), initdic)
+            self.mat.map_initialization(nargout=0)
+            if self.mat.workspace["isMapInitialized"]:
+                self.mat.initialize_slam_2(nargout=0)
+                self.is_initialized = True # call main_slam from now on
+                self.skip_images = self.skip_images_main
+                self.n_keyFrames = 2
+                self.add_pos_to_gt(self.n_keyFrames-1) # save camera position corresponding to second initilization frame
+            
                 
     def main_slam(self, image):
-        self.step += 1
+        self.slam_step += 1
         maindic = {"currI": image}
-        savemat("../orb_slam_matlab_for_qt_viewer/currI.mat", maindic)
+        savemat(os.path.join(self.mat_dir,"currI.mat"), maindic)
         self.mat.main_loop_slam(nargout=0)
+        if self.mat.workspace['isKeyFrame']: # save camera position corresponding to keyframes
+            self.n_keyFrames += 1
+            self.add_pos_to_gt(self.n_keyFrames-1)
+        
         
     def stop_slam(self):
+        # save ground truth of key frames as mat-file
         self.is_mapping = False
+        self.ground_truth_positions = self.ground_truth_positions[:self.n_keyFrames,:]
+        self.ground_truth_orientations = self.ground_truth_orientations[:self.n_keyFrames,:]
+        finishdic = {"sofaGroundTruth_pos": self.ground_truth_positions,
+                     "sofaGroundTruth_ori": self.ground_truth_orientations}
+        savemat(os.path.join(self.mat_dir,"groundTruth/groundTruth.mat"), finishdic)
         self.mat.finish_slam(nargout=0)
         
-    def get_camera_position(self):
-        new_position = np.array(self.sofa_sim.root.camera.position.value)
-        change_pos = new_position-self.position
-        if self._sim_set and np.linalg.norm(change_pos) != 0:
-            print(self.sofa_sim.root.camera.position.value)
-        self.position = new_position
-        # return camera.position.value
+    def read_camera_position(self):
+        if self.current_line < self.n_positions:
+            self.sofa_sim.root.camera.position.value = self.positions[self.current_line,:]
+            self.sofa_sim.root.camera.orientation.value = self.orientations[self.current_line,:]
+            # print(np.linalg.norm(self.orientations[self.current_line,:], keepdims=True))
+            self.current_line += 1
     
-    def get_camera_orientation(self):
-        new_orientation = np.array(self.sofa_sim.root.camera.orientation.value)
-        change_ori = new_orientation-self.orientation
-        if self._sim_set and np.linalg.norm(change_ori) != 0:
-            print(self.sofa_sim.root.camera.orientation.value)
-        self.orientation = new_orientation
-        # return camera.orientation.value
-    
+    def enforce_trajectory(self):
+        # start with circle
+        if self.sim_step <= 100:
+            self.sofa_sim.root.camera.position += [0.01, 0., 0.]
+        elif self.sim_step <= 400:
+            x_pos = math.cos(2*math.pi*(self.sim_step-100)/400)
+            y_pos = math.sin(2*math.pi*(self.sim_step-100)/400)
+            self.sofa_sim.root.camera.position.value = [x_pos, y_pos, 5.0]
+        elif self.sim_step <= 500:
+            self.sofa_sim.root.camera.position += [0., 0.01, 0.]
+        # then follow keypoints
+        else:
+            self.read_camera_position()
+
+    def write_camera_position(self):
+        if self.trajectory_path == "./trajectories/navigation/":
+            keypoint = np.empty([1,8])
+            keypoint[0,0] = self.sim_step
+            keypoint[0,1:4] = self.sofa_sim.root.camera.position.value
+            keypoint[0,4:8] = self.sofa_sim.root.camera.orientation.value
+            print(keypoint[0,:])
+            self.keypoints.append(list(keypoint[0,:]))
+        else: 
+            self.positions.append(list(self.sofa_sim.root.camera.position.value))
+            self.orientations.append(list(self.sofa_sim.root.camera.orientation.value))
+        
+            
+            
     def keyPressEvent(self, QKeyEvent):
         if QKeyEvent.key() == Qt.Key_Space:
-            if self.sofa_sim.is_animating and self.is_mapping:
-                self.stop_slam()
+            # if animating
+            # stop slam, if running
+            # write trajectories, if in tofile-mode
+            # else just stop the simulation 
+            if self.sofa_sim.is_animating:
+                if self.is_mapping: 
+                    self.stop_slam()
+                if self.mode == "tofile":
+                    if self.trajectory_path == "./trajectories/navigation/":
+                        with open(os.path.join(self.trajectory_path,"keypoints_test.txt"),"w") as f:
+                            wr = csv.writer(f,delimiter=" ",quoting=csv.QUOTE_NONNUMERIC)
+                            wr.writerows(self.keypoints)
+                    else:
+                        with open(os.path.join(self.trajectory_path,"camera_positions.txt"),"w") as f:
+                            wr = csv.writer(f,delimiter=" ",quoting=csv.QUOTE_NONNUMERIC)
+                            wr.writerows(self.positions)
+                        with open(os.path.join(self.trajectory_path,"camera_orientations.txt"),"w") as f:
+                            wr = csv.writer(f,delimiter=" ",quoting=csv.QUOTE_NONNUMERIC)
+                            wr.writerows(self.orientations)
+            # when starting the animation
+            # get new position from inputfile, if in fromfile-mode
+            # append position to array, if in tofile-mode (write to file at the end)
+            # else use computed trajctory
+            else:
+                self.sofa_sim.animation_start.connect(self.update_sim_step)
+                if self.mode == "fromfile":
+                    self.sofa_sim.animation_start.connect(self.read_camera_position)
+                elif self.mode == "tofile" and self.trajectory_path != "./trajectories/navigation/":
+                    self.sofa_sim.animation_end.connect(self.write_camera_position)
+                elif self.mode == "keypoint_navigation":
+                    self.sofa_sim.animation_end.connect(self.enforce_trajectory)
+                    # self.sofa_sim.animation_end.connect(self.write_camera_position)
                 
         if QKeyEvent.key() == Qt.Key_G: # G for GO
+            # start/stop slam only if animating
             if self.is_mapping:
                 self.stop_slam()
             elif self.sofa_sim.is_animating:
-                print("Let's go")
+                print("Start SLAM")
                 self.is_mapping = True
                 self.sofa_sim.animation_end.connect(self.update_slam) # set a qt signal to update slam after sim step
                 self.viewer_info(viewer_size=self.viewer.get_viewer_size(), intrinsics=self.viewer.get_intrinsic_parameters())
+                
+        if QKeyEvent.key() == Qt.Key_F: # F for forces
+            if self.sofa_sim.is_animating:
+                self.sofa_sim.root.CameraController.startForces = True
+                
+        if QKeyEvent.key() == Qt.Key_H:
+            if self.mode == "tofile" and self.trajectory_path == "./trajectories/navigation/":
+                self.write_camera_position()
     
     def update_slam(self):
+        # at every animation_end-event, either do nothing or pass image
+        # try initialization until map is initialized, then call main_slam
         if self.skip_counter == self.skip_images:
             self.skip_counter = 0
             if self.is_initialized:
@@ -129,3 +278,4 @@ class EngineORB:
                 self.initialize_slam(image=self.viewer.get_screen_shot())
         else:
             self.skip_counter += 1
+            

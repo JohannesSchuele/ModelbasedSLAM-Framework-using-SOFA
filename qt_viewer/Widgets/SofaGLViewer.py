@@ -75,8 +75,10 @@ class SofaGLViewer(QOpenGLWidget):
         right = 2 * near / pm[0][0] + left
         bottom = near * (pm[1][2]-1) / pm[1][1]
         top = 2.0 * near / pm[1][1] + bottom
-        cx = (left * self.width())/(left - right)
-        cy = (top * self.height())/(top - bottom)
+        # changed self.width(), self.height()
+        _, _, width, height = glGetIntegerv(GL_VIEWPORT)
+        cx = (left * width)/(left - right)
+        cy = (top * height)/(top - bottom)
         fx = -near * cx / left
         fy = near * cy / top
         return fx, fy, cx, cy
