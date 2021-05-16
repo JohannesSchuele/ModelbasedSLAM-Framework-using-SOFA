@@ -17,12 +17,13 @@ def createScene(rootNode):
                 rootNode.addObject('RequiredPlugin', name='SofaOpenglVisual')
                 rootNode.addObject('RequiredPlugin', pluginName = 'SofaGeneralVisual')
                 rootNode.addObject('RequiredPlugin', name='SofaMiscCollision')
+                rootNode.addObject('LightManager')
                 rootNode.addObject('DefaultPipeline', name="DefaultCollisionPipeline", verbose=0, draw=0, depth=6)
                 rootNode.addObject('BruteForceDetection', name="Detection")
                 rootNode.addObject('DefaultContactManager', response="default", name="collision response")
                 rootNode.addObject('MinProximityIntersection', name="Proximity", alarmDistance=0.8, contactDistance=0.64)
                 rootNode.addObject('TreeCollisionGroupManager', name="Group")
-                rootNode.addObject('BackgroundSetting', color = "0.2 0.2 0.2")
+                rootNode.addObject('BackgroundSetting', color = [0,0,0])
                 #rootNode.addObject('RecordedCamera', name='camera', rotationLookAt="0 0 5",
                     #                rotationStartPoint="0 0 0", rotationCenter="1 1 0", listening="true",
                       #              endTime="50", drawRotation="0", rotationMode="1", rotationAxis="0 0 1",
@@ -77,7 +78,7 @@ def createScene(rootNode):
                 #### Visualization
                 modelVisu = ellipsoid.addChild('visu')
                 modelVisu.addObject('MeshSTLLoader', name="visuLoader", filename="../mesh/blender_ellipsoid.stl", scale=1, translation=translation, rotation = rotation)
-                modelVisu.addObject('OglModel', name="VisualModel", src="@visuLoader", texturename="../mesh/haushalt_2_edited2.jpeg", scale =1)
+                modelVisu.addObject('OglModel', name="VisualModel", src="@visuLoader", texturename="../mesh/suchbild.dds", scale =1)
                 modelVisu.addObject('BarycentricMapping')
                 
                 
@@ -91,7 +92,13 @@ def createScene(rootNode):
                 forces = []
                 # fix hard code -> number of indices in boxROI
                 for i in range(1,29):
-                    forces.append([0,0,10])
-                ellipsoid.addObject('ConstantForceField', name="CFF", indices="@boxROI.indices", forces=forces, showArrowSize=0.1)
+                    forces.append([0,0,0])
+                ellipsoid.addObject('ConstantForceField', name="CFF", indices="@boxROI.indices", forces=forces) # , showArrowSize=0.1)
+            
+                rootNode.addObject("DirectionalLight", direction=[0, 1, 1])
+                rootNode.addObject("DirectionalLight", direction=[0, -1, -1])
+                # rootNode.addObject("DirectionalLight", direction=[1, 0, 5])
+                # rootNode.addObject("DirectionalLight", direction=[0, 0, 5])
+            
             
                 return rootNode

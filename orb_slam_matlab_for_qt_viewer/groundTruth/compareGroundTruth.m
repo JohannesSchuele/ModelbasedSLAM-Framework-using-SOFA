@@ -1,29 +1,45 @@
 %% Compare sofa ground truth with slam trajectory
-%load ground truth
+% load ground truth
 % transform ground truth into slam coordinates
 % update plot based on trajectory (scale..)
-% scale??????
 
-% save('groundTruth/sofaGroundTruth.mat',...
-%     'sofaGroundTruth_pos','sofaGroundTruth_ori');
 load('groundTruth/groundTruth.mat');
-translation = -sofaGroundTruth_pos(1,:)';
-rotation = [1 0 0; 0 -1 0; 0 0 -1];
-sofaGroundTruth_pos_transformed = [eye(3) translation; 0 0 0 1] *...
-    [sofaGroundTruth_pos'; ones(1,length(sofaGroundTruth_pos))];
-sofaGroundTruth_pos_transformed = [rotation zeros(3,1); 0 0 0 1] *...
-    sofaGroundTruth_pos_transformed;
-sofaGroundTruth_pos_transformed = sofaGroundTruth_pos_transformed(1:3,:)';
- 
-% Plot the actual camera trajectory 
-tweaked_plotActualTrajectory(mapPlot, sofaGroundTruth_pos_transformed, optimizedPoses);
+% compute transformation if too few key frames 
+if currKeyFrameId < 5
+    H_sofa2slam = computeTransformation(sofaGroundTruth_pos);
+end
+sofaGroundTruth_pos_slam = transformSofa2Slam(sofaGroundTruth_pos, H_sofa2slam);
 
+
+% [mapPointSet, vSetKeyFrames] = scaleMap(mapPointSet, vSetKeyFrames, scale, currKeyFrameId);
+% % Visualize 3D world points and camera trajectory
+% updatePlot(mapPlot, vSetKeyFrames, mapPointSet);
+
+%% Evaluate tracking accuracy
+% % compute scale factor 
+scale1 = computeScale(vSetKeyFrames,sofaGroundTruth_pos_slam);
+sofaGroundTruth_pos_slam1 = sofaGroundTruth_pos_slam/scale1;
+
+% tweaked_helperEstsmateTrajectoryError(sofaGroundTruth_pos_slam, poses(vSetKeyFrames));
+% tweaked_helperEstimateTrajectoryError(sofaGroundTruth_pos_slam, optimizedPoses);
+cameraPoses = poses(vSetKeyFrames);
+locations       = vertcat(cameraPoses.AbsolutePose.Translation);
+rmse1 = sqrt(mean( sum((locations - sofaGroundTruth_pos_slam1).^2, 2) ));
+
+sofaGroundTruth_pos_slam2 = sofaGroundTruth_pos_slam/scale;
+rmse2 = sqrt(mean( sum((locations - sofaGroundTruth_pos_slam2).^2, 2) ));
+
+if rmse1 < rmse2
+    sofaGroundTruth_pos_slam = sofaGroundTruth_pos_slam1;
+    disp(['Absolute RMSE for key frame trajectory (m): ', num2str(rmse1)]);
+else
+    sofaGroundTruth_pos_slam = sofaGroundTruth_pos_slam2;
+    disp(['Absolute RMSE for key frame trajectory (m): ', num2str(rmse2)]);
+end
+
+%% Plot the actual camera trajectory
+plot3(mapPlot.Axes, sofaGroundTruth_pos_slam(:,1), sofaGroundTruth_pos_slam(:,2), sofaGroundTruth_pos_slam(:,3), ...
+                'g','LineWidth',2, 'DisplayName', 'Actual trajectory');
 % Show legend
 showLegend(mapPlot);
-
-% Evaluate tracking accuracy
-tweaked_helperEstimateTrajectoryError(sofaGroundTruth_pos_transformed, optimizedPoses);
-
-
-
 

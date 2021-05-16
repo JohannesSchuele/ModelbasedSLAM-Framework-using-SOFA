@@ -7,16 +7,16 @@ classdef helperVisualizeMotionAndStructure < handle
 %   Copyright 2019-2020 The MathWorks, Inc.
 
     properties
-%         XLim = [-1 1]
-%         
-%         YLim = [-2 1]
-%         
-%         ZLim = [-1 3]
-        XLim = [-2 2]
+        XLim = [-1.5 1.5]
         
-        YLim = [-2 2]
+        YLim = [-1.5 1.5]
         
-        ZLim = [-1 3]
+        ZLim = [-0.5 2.5]
+%         XLim = [-6 6]
+%         
+%         YLim = [-6 6]
+%         
+%         ZLim = [-3 10]
         
         Axes
     end
@@ -46,14 +46,15 @@ classdef helperVisualizeMotionAndStructure < handle
             hold(obj.Axes, 'on');
             
             % Set figure position on the screen
-            movegui(obj.Axes.Parent, [1000 200]);
+            movegui(obj.Axes.Parent, 'center');
             
             % Plot camera trajectory
             obj.EstimatedTrajectory = plot3(obj.Axes, trajectory(:,1), trajectory(:,2), ...
-                trajectory(:,3), 'r', 'LineWidth', 2 , 'DisplayName', 'Estimated trajectory');
+                trajectory(:,3), 'w', 'LineWidth', 2 , 'DisplayName', 'Estimated trajectory');
             
             % Plot the current cameras
-            obj.CameraPlot = plotCamera(currPose, 'Parent', obj.Axes, 'Size', 0.05);
+%             obj.CameraPlot = plotCamera(currPose, 'Parent', obj.Axes, 'Size', 0.05);
+            
         end
         
         function updatePlot(obj, vSetKeyFrames, mapPoints)
@@ -114,6 +115,20 @@ classdef helperVisualizeMotionAndStructure < handle
             
             drawnow limitrate
         end
+        function tweaked_plotActualTrajectory_onthego(obj, gTruth, estimatedPoses)
+            estimatedCams = vertcat(estimatedPoses.AbsolutePose.Translation);
+            actualCams    = gTruth;
+            scale = median(vecnorm(actualCams, 2, 2))/ median(vecnorm(estimatedCams, 2, 2));
+            
+            % Update the plot based on the ground truth
+            updatePlotScale_onthego(obj, scale);
+            
+            % Plot the ground truth
+            plot3(obj.Axes, actualCams(:,1), actualCams(:,2), actualCams(:,3), ...
+                'g','LineWidth',2, 'DisplayName', 'Actual trajectory');
+            
+            drawnow limitrate
+        end
         
         function showLegend(obj)
             % Add a legend to the axes
@@ -140,9 +155,9 @@ classdef helperVisualizeMotionAndStructure < handle
         function updatePlotScale(obj, scale)
             % Update the map points and camera trajectory based on the
             % ground truth scale
-            obj.Axes.XLim = obj.Axes.XLim * scale;
-            obj.Axes.YLim = obj.Axes.YLim * scale;
-            obj.Axes.ZLim = obj.Axes.ZLim * scale;
+%             obj.Axes.XLim = obj.Axes.XLim * scale;
+%             obj.Axes.YLim = obj.Axes.YLim * scale;
+%             obj.Axes.ZLim = obj.Axes.ZLim * scale;
             
             % Map points
             obj.Axes.Children(end).XData = obj.Axes.Children(end).XData * scale;
@@ -156,6 +171,23 @@ classdef helperVisualizeMotionAndStructure < handle
             obj.OptimizedTrajectory.XData =  obj.OptimizedTrajectory.XData * scale;
             obj.OptimizedTrajectory.YData =  obj.OptimizedTrajectory.YData * scale;
             obj.OptimizedTrajectory.ZData =  obj.OptimizedTrajectory.ZData * scale;
+        end
+        function updatePlotScale_onthego(obj, scale)
+            % Update the map points and camera trajectory based on the
+            % ground truth scale
+%             obj.Axes.XLim = obj.Axes.XLim * scale;
+%             obj.Axes.YLim = obj.Axes.YLim * scale;
+%             obj.Axes.ZLim = obj.Axes.ZLim * scale;
+            
+            % Map points
+            obj.Axes.Children(end).XData = obj.Axes.Children(end).XData * scale;
+            obj.Axes.Children(end).YData = obj.Axes.Children(end).YData * scale;
+            obj.Axes.Children(end).ZData = obj.Axes.Children(end).ZData * scale;
+            
+            % Estiamted and optimized Camera trajectory
+            obj.EstimatedTrajectory.XData =  obj.EstimatedTrajectory.XData * scale;
+            obj.EstimatedTrajectory.YData =  obj.EstimatedTrajectory.YData * scale;
+            obj.EstimatedTrajectory.ZData =  obj.EstimatedTrajectory.ZData * scale;
         end
     end
 end

@@ -161,3 +161,95 @@ plot3(pointsProjection(:,4),...
 legend('STL File','Unprojected Points','Projected Points')
 
 disp(length(i_unprojected));
+
+
+%%
+load presentation.mat
+close all 
+figure
+trimesh(stlData,'FaceColor','w','EdgeColor','k')
+% view([0 -30 -90])
+hold on; grid off; axis off
+A1 = stlData.Points(427,:);
+B1 = stlData.Points(449,:);
+C1 = stlData.Points(429,:);
+
+plot3(A1(1), A1(2), A1(3),'.','Color','k','MarkerSize',10)
+% plot3(B1(1), B1(2), B1(3),'x','Color','r')
+% plot3(C1(1), C1(2), C1(3),'x','Color','r')
+plot3(linspace(A1(1),B1(1)), linspace(A1(2),B1(2)), linspace(A1(3),B1(3)), 'r', 'LineWidth', 1.5)
+plot3(linspace(A1(1),C1(1)), linspace(A1(2),C1(2)), linspace(A1(3),C1(3)), 'r', 'LineWidth', 1.5)
+plot3(linspace(C1(1),B1(1)), linspace(C1(2),B1(2)), linspace(C1(3),B1(3)), 'r', 'LineWidth', 1.5)
+
+
+figure
+hold on; grid off; axis off
+plot3(A1(1), A1(2), A1(3),'x','Color','r')
+plot3(B1(1), B1(2), B1(3),'x','Color','r')
+plot3(C1(1), C1(2), C1(3),'x','Color','r')
+plot3(linspace(A1(1),B1(1)), linspace(A1(2),B1(2)), linspace(A1(3),B1(3)), 'r')
+plot3(linspace(A1(1),C1(1)), linspace(A1(2),C1(2)), linspace(A1(3),C1(3)), 'r')
+plot3(linspace(C1(1),B1(1)), linspace(C1(2),B1(2)), linspace(C1(3),B1(3)), 'r')
+plot3(viewCameraPosition(1), viewCameraPosition(2), viewCameraPosition(3),'.','MarkerSize', 20)
+P_proj = 0.5*A1 + 0.25 *B1 + 0.25*C1;
+P = P_proj - 0.1 * P_proj;
+plot3(P(1), P(2), P(3),'.','Color','b','MarkerSize', 10)
+
+plot3(linspace(viewCameraPosition(1),1.5*P(1)), linspace(viewCameraPosition(2),1.5*P(2)), linspace(viewCameraPosition(3),1.5*P(3)), 'k')
+
+plot3(P_proj(1), P_proj(2), P_proj(3),'.','Color','k','MarkerSize', 10)
+
+viewCameraPosition2 = [0.1, -0.2, 0];
+plot3(viewCameraPosition2(1), viewCameraPosition2(2), viewCameraPosition2(3),'.','MarkerSize', 20)
+
+
+% A = [-0.259, -0.405, 1.316];
+A = stlData.Points(448,:);
+% B = [-0.233, -0.366,1.367];
+B = stlData.Points(450,:);
+% C = [-0.296, -0.313, 1.367];
+C = stlData.Points(428,:);
+% D = [-0.329, -0.346, 1.316];
+D = stlData.Points(426,:);
+% E = [-0.274, -0.429, 1.262];
+E = stlData.Points(446,:);
+% F = [-0.189, -0.475, 1.262];
+F = stlData.Points(453,:);
+% G = [-0.178, -0.449, 1.316];
+G = stlData.Points(454,:);
+
+ans_1 = find(points(:,1)==A(1));
+ans_2 = find(points(:,2)==A(2));
+ans_3 = find(points(:,3)==A(3));
+ans_4 = intersect(ans_1,ans_2);
+id = intersect(ans_4,ans_3);
+
+close all 
+figure
+trimesh(stlData,'FaceColor','w','EdgeColor','k')
+% view([0 -30 -90])
+hold on; grid off; axis off
+
+plot3(linspace(A(1),B(1)), linspace(A(2),B(2)), linspace(A(3),B(3)), 'Color', [0.3010 0.7450 0.9330], 'LineWidth', 1.5)
+plot3(linspace(A(1),C(1)), linspace(A(2),C(2)), linspace(A(3),C(3)), 'Color', [0.3010 0.7450 0.9330], 'LineWidth', 1.5)
+plot3(linspace(C(1),B(1)), linspace(C(2),B(2)), linspace(C(3),B(3)), 'Color', [0.3010 0.7450 0.9330], 'LineWidth', 1.5)
+
+plot3(linspace(A(1),D(1)), linspace(A(2),D(2)), linspace(A(3),D(3)), 'Color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+plot3(linspace(D(1),C(1)), linspace(D(2),C(2)), linspace(D(3),C(3)), 'Color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+
+plot3(linspace(A(1),E(1)), linspace(A(2),E(2)), linspace(A(3),E(3)), 'Color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+plot3(linspace(D(1),E(1)), linspace(D(2),E(2)), linspace(D(3),E(3)), 'Color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+
+plot3(linspace(A(1),F(1)), linspace(A(2),F(2)), linspace(A(3),F(3)), 'Color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+plot3(linspace(F(1),E(1)), linspace(F(2),E(2)), linspace(F(3),E(3)), 'Color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+
+plot3(linspace(A(1),G(1)), linspace(A(2),G(2)), linspace(A(3),G(3)), 'Color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+plot3(linspace(F(1),G(1)), linspace(F(2),G(2)), linspace(F(3),G(3)), 'Color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+
+plot3(linspace(B(1),G(1)), linspace(B(2),G(2)), linspace(B(3),G(3)), 'Color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+
+plot3(A(1), A(2), A(3),'.','Color',[0, 0, 0],'MarkerSize',25)
+
+
+
+
