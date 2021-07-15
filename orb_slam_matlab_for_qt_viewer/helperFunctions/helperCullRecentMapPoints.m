@@ -1,4 +1,4 @@
-function [mapPointSet, directionAndDepth, mapPointsIdx] = helperCullRecentMapPoints(mapPointSet, directionAndDepth, mapPointsIdx, newPointIdx)
+function [mapPointSet, directionAndDepth, mapPointsIdx, outlierIdx] = helperCullRecentMapPoints(mapPointSet, directionAndDepth, mapPointsIdx, newPointIdx)
 outlierIdx    = setdiff(newPointIdx, mapPointsIdx);
 if ~isempty(outlierIdx)
     mapPointSet   = removeWorldPoints(mapPointSet, outlierIdx);

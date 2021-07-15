@@ -1,7 +1,7 @@
 import Sofa
 import Sofa.Core
 from Sofa.constants import *
-
+import math
 
 
 class controller(Sofa.Core.Controller):
@@ -15,40 +15,49 @@ class controller(Sofa.Core.Controller):
         self.totalTime = 0.0
         self.object = self.node.getChild('ellipsoid')
         self.startForce = 0
-        self.endForce = 50
-        self.startTime = 2
-        self.endTime = 15
+        self.endForce = 15
+        self.startTime = False
+        self.endTime = 20
+        self.startForces = False
+        self.immediateForce1 = False
+        self.immediateForce2 = False
+        
 
     def onAnimateEndEvent(self, event):
-        self.totalTime += event['dt']
-        if self.totalTime <= 1:
-            self.node.camera.position += [0., 0.01, 0.]
-        elif self.totalTime <= 2:
-            self.node.camera.position += [0.01, 0., 0.]
-        elif self.totalTime <= 4:
-            self.node.camera.position += [0., -0.01, 0.01]
-        elif self.totalTime <= 6:
-            self.node.camera.position += [-0.01, 0., -0.01]
-        elif self.totalTime <= 7:
-            self.node.camera.position += [0., 0.01, 0.]
-        elif self.totalTime <= 8:
-            self.node.camera.position += [0.01, 0., 0.]
+        self.totalTime += event['dt'] # dt = 0.01     
+        
+        if self.startForces and not self.startTime:
+            self.startTime = self.totalTime
+            self.endTime = self.startTime + self.endTime
             
-
-        if self.totalTime >= self.startTime and self.totalTime <= self.endTime:
+        if self.startForces and self.totalTime <= self.endTime:
             n = len(self.object.boxROI.findData("indices").value)
             forces = []
             xForce = self.startForce + (self.endForce-self.startForce) * (self.totalTime-self.startTime)/(self.endTime-self.startTime)
+            xForce = 0
             yForce = self.startForce + (self.endForce-self.startForce) * (self.totalTime-self.startTime)/(self.endTime-self.startTime)
+            yForce = -yForce
             zForce = self.startForce + (self.endForce-self.startForce) * (self.totalTime-self.startTime)/(self.endTime-self.startTime)
             for i in range(1,n+1):
                 forces.append([xForce,yForce,zForce])
             self.object.CFF.findData('indices').value = self.object.boxROI.findData("indices").value
             self.object.CFF.findData('forces').value = forces
-        
+            
+        if self.immediateForce1:
+            n = len(self.object.boxROI.findData("indices").value)
+            forces = []
+            for i in range(1,n+1):
+                forces.append([5,5,5])
+                self.object.CFF.findData('indices').value = self.object.boxROI.findData("indices").value
+                self.object.CFF.findData('forces').value = forces
+       
+        if self.immediateForce2:
+            n = len(self.object.boxROI.findData("indices").value)
+            forces = []
+            for i in range(1,n+1):
+                forces.append([10,10,10])
+                self.object.CFF.findData('indices').value = self.object.boxROI.findData("indices").value
+                self.object.CFF.findData('forces').value = forces
 
 
-#    def onKeypressedEvent(self, event):
-
-
-
+    # def onKeypressedEvent(self, event):

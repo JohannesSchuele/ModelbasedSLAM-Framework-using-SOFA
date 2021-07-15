@@ -26,7 +26,7 @@ class SofaSim(QObject):
         self.root = SCore.Node("Root")
         root = self.root
         root.gravity = [0, 0, 0]
-        root.addObject("VisualStyle", displayFlags="showVisual showAll")
+        root.addObject("VisualStyle", displayFlags="showVisual")
         root.addObject("MeshGmshLoader", name="meshGmsh",
                        filename="../mesh/blender_ellipsoid.msh")
 #        root.addObject("MeshSTLLoader", name="meshSTL",
@@ -39,7 +39,8 @@ class SofaSim(QObject):
         translation = [0, 0, 0]
         rotation = [0, 0, 0]
         stlFilename = "../mesh/blender_ellipsoid.stl"
-        textureFilename = "../mesh/haushalt_2_edited2.dds"
+        # textureFilename = "../mesh/haushalt_2_edited3.dds"
+        textureFilename = "../mesh/suchbild.dds"
         ellipsoid = root.addChild("ellipsoid")
 
         ellipsoid.addObject("TetrahedronSetTopologyContainer",
@@ -63,7 +64,7 @@ class SofaSim(QObject):
         # Visual
         visual = ellipsoid.addChild("visual")
         visual.addObject('MeshSTLLoader', name="meshLoader_0", filename=stlFilename, translation=translation, rotation=rotation)
-        visual.addObject('OglModel', name="VisualModel", src="@meshLoader_0", texturename=textureFilename, scale =1)
+        visual.addObject('OglModel', name="VisualModel", src="@meshLoader_0", texturename=textureFilename, scale =1, rotation=[0, 0, 0])
         visual.addObject('BarycentricMapping', input="@..", output="@VisualModel", name="visual mapping")
         # Collision
         collision = ellipsoid.addChild("collision")
@@ -75,15 +76,20 @@ class SofaSim(QObject):
         # collision.addObject('Point', selfCollision="false")
         collision.addObject('BarycentricMapping', input="@..", output="@collisMech", name="visual mapping")
 
-        ellipsoid.addObject('BoxROI', name='boxROI', box='-0.1 0.3 0.5 1.0 1.5 1.5', drawBoxes=True)
-        ellipsoid.addObject('ConstantForceField', name="CFF", indices=[1], forces=[0,0,0], showArrowSize="0.01")
+        # ellipsoid.addObject('BoxROI', name='boxROI', box='-0.1 0.3 0.5 1.0 1.5 1.5', drawBoxes=True)
+        ellipsoid.addObject('BoxROI', name='boxROI', box='-1.5 -1.5 0.2 1.5 0 1.5', drawBoxes=True)
+        # ellipsoid.addObject('BoxROI', name='boxROI', box='-0.5 -0.3 0.7 0.5 0.2 1.5', drawBoxes=True)
+        ellipsoid.addObject('ConstantForceField', name="CFF", indices=[1], forces=[0,0,0]) #, showArrowSize="0.01"
 
         # place light and a camera
+        self.root.addObject("BackgroundSetting", color=[1,1,1])
         self.root.addObject("LightManager")
         self.root.addObject("DirectionalLight", direction=[0, 1, 1])
+        self.root.addObject("DirectionalLight", direction=[0, -1, -1])
         self.root.addObject("InteractiveCamera", name="camera", position=[0, 0, 5],
                             lookAt=[0, 0, 0], distance=5,
                             fieldOfView=45, zNear=0.160738, zFar=20)
+        #?????? so strange
                             
         # add controller
         self.root.addObject(controller(name="CameraController", node=root))

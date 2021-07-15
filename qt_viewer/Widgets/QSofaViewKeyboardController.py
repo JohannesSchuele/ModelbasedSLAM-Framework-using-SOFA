@@ -55,6 +55,7 @@ class QSofaViewKeyboardController(QObject):
     def keyPressEvent(self, event):
         key = event.key()
         mod = event.modifiers()
+        
         if key == Qt.Key_Up:
             self.current_rotational_speed[0] = -self.rotate_rate_limit
         elif key == Qt.Key_Down:
@@ -84,10 +85,15 @@ class QSofaViewKeyboardController(QObject):
             self.current_translational_speed[0] = self.translate_rate_limit
         elif key == Qt.Key_D:
             self.current_translational_speed[0] = -self.translate_rate_limit
+            
+        elif key == Qt.Key_Control:
+            self.current_rotational_speed[1] = 0
+            self.current_translational_speed[1] = 0
 
     def keyReleaseEvent(self, event: QKeyEvent):
         key = event.key()
         mod = event.modifiers()
+        
         if key == Qt.Key_Up:
             self.current_rotational_speed[0] = 0
         elif key == Qt.Key_Down:
@@ -118,6 +124,10 @@ class QSofaViewKeyboardController(QObject):
         elif key == Qt.Key_D:
             self.current_translational_speed[0] = 0
 
+        elif key == Qt.Key_Control:
+            self.current_rotational_speed[2] = 0
+            self.current_translational_speed[2] = 0
+            
     def update_camera(self):
         now = time.time()
         time_since_last_update = self.time_at_last_update - now

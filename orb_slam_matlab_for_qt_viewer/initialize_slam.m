@@ -1,41 +1,36 @@
 clear all; close all;
-addpath 'helperFunctions' 'initialization_steps' 'groundTruth'
-load initImages.mat
+addpath 'helperFunctions' 'initialization_steps' 'groundTruth' 'projectionAndPrediction'
+load initI.mat
 initIm = 1;
+doProjections = 1;
+projectionInitialized = 0;
+minNumberOfKeyframesBeforeProjection = 5; % !> minNumberOfKeyframesBeforeScalings
+minNumberOfKeyframesBeforeScaling = 5;
+% scale = 0; % ensure rescale after minNumberOfKeyframesBeforeScaling at least once
+scale = 4.15; % known scale factor
 % Inspect the first image
 currFrameIdx = initIm;
 % currI = readimage(imds, currFrameIdx);
 imageSize = double([viewerHeight, viewerWidth]);
-initImages = uint8(initImages);
-currI = initImages(1:viewerHeight,:,:);
+currI = uint8(currI);
 % himage = imshow(currI);
-
+f = double(viewerHeight) / 1200 * 1.448882146816558e+03;
+focalLength = [f f];
 %% Load camera intrinsics
 intrinsics = cameraIntrinsics(focalLength, principalPoint, imageSize);
-%% Map initialization
-map_initialization
 
-%% Store Initial Key Frames and Map Points
-store_initial_key_frames_and_map_points
+%% Start of map initialization
+% Set random seed for reproducibility
+rng(0);
 
-%% Refine and Visualize the Initial Reconstruction
-refine_and_visualize_initial_reconstruction
+% Detect and extract ORB features
+scaleFactor = 1.2;
+numLevels   = 8;
+[preFeatures, prePoints] = helperDetectAndExtractFeatures(currI, scaleFactor, numLevels, intrinsics); 
 
-%% Tracking
-% ViewId of the current key frame
-currKeyFrameId    = currViewId;
+currFrameIdx = currFrameIdx + 1;
+firstI       = currI; % Preserve the first frame 
 
-% ViewId of the last key frame
-lastKeyFrameId    = currViewId;
+isMapInitialized  = false;
 
-% ViewId of the reference key frame that has the most co-visible 
-% map points with the current key frame
-refKeyFrameId     = currViewId;
 
-% Index of the last key frame in the input image sequence
-lastKeyFrameIdx   = currFrameIdx - 1; 
-
-% Indices of all the key frames in the input image sequence
-addedFramesIdx    = [initIm; lastKeyFrameIdx];
-
-isLoopClosed      = false;

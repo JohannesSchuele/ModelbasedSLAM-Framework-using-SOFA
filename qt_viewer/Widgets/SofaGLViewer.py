@@ -75,8 +75,10 @@ class SofaGLViewer(QOpenGLWidget):
         right = 2 * near / pm[0][0] + left
         bottom = near * (pm[1][2]-1) / pm[1][1]
         top = 2.0 * near / pm[1][1] + bottom
-        cx = (left * self.width())/(left - right)
-        cy = (top * self.height())/(top - bottom)
+        # changed self.width(), self.height()
+        _, _, width, height = glGetIntegerv(GL_VIEWPORT)
+        cx = (left * width)/(left - right)
+        cy = (top * height)/(top - bottom)
         fx = -near * cx / left
         fy = near * cy / top
         return fx, fy, cx, cy
@@ -144,6 +146,17 @@ class SofaGLViewer(QOpenGLWidget):
         buff = glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE)
         image = np.frombuffer(buff, dtype=np.uint8)
         return np.flipud(image.reshape(height, width, 3))
+    
+    # def get_screen_locations(self, points: List[List[float]]):
+    #     """
+    #     :param points: list of 3D world coordinate points
+    #     :return: (x, y, z) positions in the screen coordinates
+    #     """
+    #     points = np.asarray(points)
+    #     screen_positions = np.zeros((len(points), 3))
+    #     for i in range(len(points)):
+    #         screen_positions[i] = gluProject(points[i][0], points[i][1], points[i][2])
+    #     return screen_positions
     
     def keyPressEvent(self, a0: QKeyEvent) -> None:
         self.key_pressed.emit(a0)

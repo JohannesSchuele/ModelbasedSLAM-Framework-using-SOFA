@@ -1,5 +1,46 @@
 # GIT_ORB_SLAM_MATLAB
  
+ Added matlab orb slam using qt viewer
+ Most important controls:
+ SPACE: start/ stop simulation
+ 
+ Overview different navigation modes:
+ "tofile"
+        control the camera and generate a trajectory (array containing position and orientation of the camera at each time step)
+        trajectory_path is the folder where the output is written to (.txt-file)
+        if trajectory_path=="./trajectories/navigation/": you can navigate however you want and press H to add the current camera configuration to keypoint array
+        not that in this case you can select as many keypoints as you like, the path between them is not important (see keypoint_navigation), however by default also the current sim_step (so basically a timestamp) is part of the keypoint and thus determines the navigation speed. You can change the timestamps in keypoints.txt to change the speed of each part of the movement
+ "fromfile"
+        uses the files in the specified folder trajectory_path and reads out position and orientation of the camera for each simulation step
+ "keypoint_navigation"
+        keypoints are read and then connected trough linear interpolation to generate a trajectory that passes each keypoint at the specified time
+        
+-> all of this is a little messy atm but seems to work reliably enough, but I will try to clean this up a little, to/fromfile-mode (no keypoint_navigation) are relatively complicated to use because the camera movement using the key controls is not completely intuitive at times, thus resulting in unwanted movements
+-> keypoint navigation allows you to use points of interest and just connect them in a linear fashion, while at the same time determining the speed of the movement
+-> however to get a continuous/smooth motion you might need many keypoints (or finetune them) which takes some time
+ 
+ Improvements TODO:
+ 1. outsource all trajectory related computation, read/write, etc. into seperate class
+ 2. projection !!
+ 2. test transformation of map (translation etc.) / accessability of worldPointSet
+ 3. improve body / texture
+ 4. export mesh from sofa: vtk exporter, monitor, state exporter
+ 5. add option to save sequence, groundTruth and map together at the end 
+ 
+ 
+ Tuning parameters SLAM:
+ 1. fps/movement velocity
+ 2. helperIsKeyFrame: 
+     - minimum number of frames that have to pass before new keyFrame is allowed
+     - minimum number of map points
+     - tracked points ratio between current frame and last keyFrame
+     -> obviously more keyFrames "=" more accuracy but also more expensive computationally, thus slower
+ 3. numLevels, scaleFactor of detectORBFeatures determine feature detection performance
+ 
+ 
+OLD STUFF:
+ -
+ 
 Contains Matlab Code for ORB SLAM + Sofa scene using RecordedCamera component to generate screenshots.
 TODO before use:
 1. change self.sequenceDIR (line 28, CameraControllerORB.py) to your sofa screenshot directory
@@ -15,15 +56,6 @@ Everything else should work right off the bat.
 Regarding possible error in line 3 (estimateGeometricTransform2D) of "helperFunctions/helperComputeHomography.m": This function was added in MATLAB 2020b so mat.engine for 2020b has to be used.
 More information about this: https://de.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
 
-Improvements TODO:
-1. test deformation of body in sofa, add mechanical properties, force
-2. test transformation of map (translation etc.) / accessability of worldPointSet
-3. improve body / texture
-4. Fix matlab engine problem
-5. export mesh from sofa: vtk exporter, monitor, state exporter
-6. add NavigationRecordedCameraScene for different movement
-7. add option to save sequence, groundTruth and map together at the end
-
 UPDATE 29/01/2021:
 1. updated camera calibration, should now work better
 2. added comments
@@ -34,11 +66,5 @@ UPDATE 29/01/2021:
 7. extension of 6.: added automatic SLAM start when starting the animation/simulation in sofa. cmd+'a' still stops SLAM and evaluates ground truth (see orb_slam_matlab/groundTruthcompareGroundTruth.m)
 8. added example sequence and corresponding ground truth in 'example', you can test this with slam_whole_in_one.m
 
-Tuning parameters SLAM:
-1. fps/movement velocity
-2. helperIsKeyFrame: 
-    - minimum number of frames that have to pass before new keyFrame is allowed
-    - minimum number of map points
-    - tracked points ratio between current frame and last keyFrame
-    -> obviously more keyFrames "=" more accuracy but also more expensive computationally, thus slower
+
 
