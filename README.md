@@ -1,8 +1,9 @@
-# GIT_ORB_SLAM_MATLAB
+# Implementation for a Proof of Concept of a model-based SLAM Approach for Deformable Bodies using the Simulation Open Framework Architecture (Sofa)
 This project is a proof of concept implementation of a model-based localization algorithm for deformable systems. The proposed approach considers a real-time co-simulation to predict deformations. The simulated deformations are incorporated in a state-of-the-art simultaneous localization and mapping (SLAM) algorithm to enable precise localization in an endoscopic, non-rigid environment.
 Thefore we use the Simulation Open Framework Architecture https://www.sofa-framework.org/ (SOFA).
 An ideal model and accurate knowledge of the acting forces are assumed. 
 This work is intended as proof of concept to provide fundamental ideas and the framework to apply a model-based localization algorithm in a real-world endoscopic surgery environment. 
+![image](https://user-images.githubusercontent.com/62347327/136781115-92a76623-bb7b-4751-8c9d-59e531e68ec0.png)
 
 
  Added matlab orb slam using qt viewer
@@ -25,17 +26,25 @@ This work is intended as proof of concept to provide fundamental ideas and the f
 -> however to get a continuous/smooth motion you might need many keypoints (or finetune them) which takes some time
  
 # Prerequisites
-Sofa Python3 bindings
-qtpy, PyQt5
-pyqtgraph
-networkx
-cv2
+- Sofa Python3 bindings (use _sp3) https://github.com/sofa-framework/SofaPython3
+- Sofa Python2 _sp2 is temporary available
+- qtpy, PyQt5
+- pyqtgraph
+- networkx
+- cv2
+- MATLAB Engine for Python 2020 https://de.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
+
 
 # Workflow
 Load scene with controller commented out -> change viewer -> uncomment line 18 -> reload scene (cmd+'r') -> start animate ->  cmd+'a' to start/stop SLAM 
 
+![image](https://user-images.githubusercontent.com/62347327/136782384-84e4775f-31ad-41c9-9d52-1d109d8746b8.png)
 
- # Improvements TODO:
+Results of the conventional SLAM algorithm in a rigid (top) and deformable (middle) environment along with the same deformation applied to the model-based approach (bottom)
+
+
+
+# Improvements TODO:
  1. outsource all trajectory related computation, read/write, etc. into seperate class
  2. test transformation of map (translation etc.) / accessability of worldPointSet
  3. improve body / texture
@@ -54,9 +63,8 @@ Load scene with controller commented out -> change viewer -> uncomment line 18 -
  
  
  
-#Additonal Information:
- -
- 
+#  Additonal Information:
+
 Contains Matlab Code for ORB SLAM + Sofa scene using RecordedCamera component to generate screenshots.
 TODO before use:
 1. change self.sequenceDIR (line 28, CameraControllerORB.py) to your sofa screenshot directory
