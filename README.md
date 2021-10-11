@@ -26,7 +26,7 @@ This work is intended as proof of concept to provide fundamental ideas and the f
 -> however to get a continuous/smooth motion you might need many keypoints (or finetune them) which takes some time
  
 # Prerequisites
-- Sofa Python3 bindings (use _sp3)
+- Sofa Python3 bindings (use _sp3) https://github.com/sofa-framework/SofaPython3
 - Sofa Python2 _sp2 is temporary available
 - qtpy, PyQt5
 - pyqtgraph
