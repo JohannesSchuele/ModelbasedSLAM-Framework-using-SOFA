@@ -35,7 +35,7 @@ cv2
 # Workflow
 Load scene with controller commented out -> change viewer -> uncomment line 18 -> reload scene (cmd+'r') -> start animate ->  cmd+'a' to start/stop SLAM 
 
-![image](https://user-images.githubusercontent.com/62347327/136781773-57b2c977-fb89-4003-84c6-8ae6a0302d43.png)
+![image](https://user-images.githubusercontent.com/62347327/136782384-84e4775f-31ad-41c9-9d52-1d109d8746b8.png)
 Results of the conventional SLAM algorithm in a rigid (top) and deformable (middle) environment along with the same deformation applied to the model-based approach (bottom)
 
 
