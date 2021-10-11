@@ -1,5 +1,10 @@
 # GIT_ORB_SLAM_MATLAB
- 
+This project is a proof of concept implementation of a model-based localization algorithm for deformable systems. The proposed approach considers a real-time co-simulation to predict deformations. The simulated deformations are incorporated in a state-of-the-art simultaneous localization and mapping (SLAM) algorithm to enable precise localization in an endoscopic, non-rigid environment.
+Thefore we use the Simulation Open Framework Architecture https://www.sofa-framework.org/ (SOFA).
+An ideal model and accurate knowledge of the acting forces are assumed. 
+This work is intended as proof of concept to provide fundamental ideas and the framework to apply a model-based localization algorithm in a real-world endoscopic surgery environment. 
+
+
  Added matlab orb slam using qt viewer
  Most important controls:
  SPACE: start/ stop simulation
@@ -19,16 +24,26 @@
 -> keypoint navigation allows you to use points of interest and just connect them in a linear fashion, while at the same time determining the speed of the movement
 -> however to get a continuous/smooth motion you might need many keypoints (or finetune them) which takes some time
  
- Improvements TODO:
+# Prerequisites
+Sofa Python3 bindings
+qtpy, PyQt5
+pyqtgraph
+networkx
+cv2
+
+# Workflow
+Load scene with controller commented out -> change viewer -> uncomment line 18 -> reload scene (cmd+'r') -> start animate ->  cmd+'a' to start/stop SLAM 
+
+
+ # Improvements TODO:
  1. outsource all trajectory related computation, read/write, etc. into seperate class
- 2. projection !!
  2. test transformation of map (translation etc.) / accessability of worldPointSet
  3. improve body / texture
  4. export mesh from sofa: vtk exporter, monitor, state exporter
  5. add option to save sequence, groundTruth and map together at the end 
  
  
- Tuning parameters SLAM:
+ # Tuning parameters SLAM:
  1. fps/movement velocity
  2. helperIsKeyFrame: 
      - minimum number of frames that have to pass before new keyFrame is allowed
@@ -38,7 +53,8 @@
  3. numLevels, scaleFactor of detectORBFeatures determine feature detection performance
  
  
-OLD STUFF:
+ 
+#Additonal Information:
  -
  
 Contains Matlab Code for ORB SLAM + Sofa scene using RecordedCamera component to generate screenshots.
