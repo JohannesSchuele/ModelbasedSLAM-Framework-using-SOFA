@@ -1,4 +1,4 @@
-#A Model-based Simultaneous Localization and Mapping Approach for Deformable Bodies using the Simulation Open Framework Architecture (Sofa)
+#Proof of Concept of a model-based SLAM Approach for Deformable Bodies using the Simulation Open Framework Architecture (Sofa)
 This project is a proof of concept implementation of a model-based localization algorithm for deformable systems. The proposed approach considers a real-time co-simulation to predict deformations. The simulated deformations are incorporated in a state-of-the-art simultaneous localization and mapping (SLAM) algorithm to enable precise localization in an endoscopic, non-rigid environment.
 Thefore we use the Simulation Open Framework Architecture https://www.sofa-framework.org/ (SOFA).
 An ideal model and accurate knowledge of the acting forces are assumed. 
