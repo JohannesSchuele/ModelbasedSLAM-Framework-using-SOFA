@@ -3,6 +3,7 @@ This project is a proof of concept implementation of a model-based localization 
 Thefore we use the Simulation Open Framework Architecture https://www.sofa-framework.org/ (SOFA).
 An ideal model and accurate knowledge of the acting forces are assumed. 
 This work is intended as proof of concept to provide fundamental ideas and the framework to apply a model-based localization algorithm in a real-world endoscopic surgery environment. 
+![image](https://user-images.githubusercontent.com/62347327/136781115-92a76623-bb7b-4751-8c9d-59e531e68ec0.png)
 
 
  Added matlab orb slam using qt viewer
