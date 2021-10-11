@@ -26,11 +26,11 @@ This work is intended as proof of concept to provide fundamental ideas and the f
 -> however to get a continuous/smooth motion you might need many keypoints (or finetune them) which takes some time
  
 # Prerequisites
-Sofa Python3 bindings
-qtpy, PyQt5
-pyqtgraph
-networkx
-cv2
+- Sofa Python3 bindings (use _sp3 or for Sofa Python2 _sp2 is also temporary available) 
+- qtpy, PyQt5
+- pyqtgraph
+- networkx
+- cv2
 
 # Workflow
 Load scene with controller commented out -> change viewer -> uncomment line 18 -> reload scene (cmd+'r') -> start animate ->  cmd+'a' to start/stop SLAM 
