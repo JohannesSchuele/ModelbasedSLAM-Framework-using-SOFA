@@ -35,7 +35,7 @@ cv2
 Load scene with controller commented out -> change viewer -> uncomment line 18 -> reload scene (cmd+'r') -> start animate ->  cmd+'a' to start/stop SLAM 
 
 
- # Improvements TODO:
+# Improvements TODO:
  1. outsource all trajectory related computation, read/write, etc. into seperate class
  2. test transformation of map (translation etc.) / accessability of worldPointSet
  3. improve body / texture
@@ -54,9 +54,8 @@ Load scene with controller commented out -> change viewer -> uncomment line 18 -
  
  
  
-#Additonal Information:
- -
- 
+#  Additonal Information:
+
 Contains Matlab Code for ORB SLAM + Sofa scene using RecordedCamera component to generate screenshots.
 TODO before use:
 1. change self.sequenceDIR (line 28, CameraControllerORB.py) to your sofa screenshot directory
