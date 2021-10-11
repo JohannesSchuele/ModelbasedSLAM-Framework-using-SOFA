@@ -3,8 +3,7 @@ load currI.mat
 currI = uint8(currI);
 
 %% forward prediction
-% forward predict projected points at each slam step, not just at key
-% frames
+% forward predict projected points at each slam step, not just at key frames
 if currKeyFrameId == minNumberOfKeyframesBeforeScaling-1
     % comp~ute the transformation between sofa and slam coordinates
     load('groundTruth/groundTruth.mat');
@@ -35,7 +34,6 @@ end
 
 %% Tracking
 [currFeatures, currPoints] = helperDetectAndExtractFeatures(currI, scaleFactor, numLevels, intrinsics);
-
 % Track the last key frame
 % mapPointsIdx:   Indices of the map points observed in the current frame
 % featureIdx:     Indices of the corresponding feature points in the 
@@ -53,7 +51,6 @@ end
 
 % Check if the current frame is a key frame. 
 % A frame is a key frame if both of the following conditions are satisfied:
-%
 % 1. At least 20 frames have passed since the last key frame or the 
 %    current frame tracks fewer than 80 map points
 % 2. The map points tracked by the current frame are fewer than 90% of 
@@ -62,7 +59,6 @@ isKeyFrame = helperIsKeyFrame(mapPointSet, refKeyFrameId, lastKeyFrameIdx, ...
     currFrameIdx, mapPointsIdx);
 % Visualize matched features
 % updatePlot(featurePlot, currI, currPoints(featureIdx));
-
 if ~isKeyFrame
     currFrameIdx = currFrameIdx + 1;
     return

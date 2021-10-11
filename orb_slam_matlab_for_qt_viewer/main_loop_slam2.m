@@ -48,7 +48,6 @@ end
 %         [mapPointSet, vSetKeyFrames] = scaleMap(mapPointSet, vSetKeyFrames, scale, currKeyFrameId);
 %     end
 % end
-
 %% Projection and prediction
 if  doProjections && currKeyFrameId >= minNumberOfKeyframesBeforeProjection
     % If enough key frames have passed project

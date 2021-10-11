@@ -1,5 +1,5 @@
-path_1 = '/Users/jona/Documents/Uni/Bachelorarbeit/Thesis/isys_1.png';
-path_2 = '/Users/jona/Documents/Uni/Bachelorarbeit/Thesis/isys_2.png';
+path_1 = '/isys_1.png';
+path_2 = '/isys_2.png';
 
 isys_1 = rgb2gray(imread(path_1));
 isys_2 = rgb2gray(imread(path_2));

@@ -4,7 +4,6 @@ addpath 'helperFunctions'
 % imageFolder   = '/Users/jona/sofa/build/screenshots/';
 imageFolder = 'example/sequence';
 imds          = imageDatastore(imageFolder);
-
 % Inspect the first image
 currFrameIdx = 1;
 currI = readimage(imds, currFrameIdx);
@@ -67,7 +66,7 @@ while ~isMapInitialized && currFrameIdx < numel(imds.Files)
     if size(indexPairs, 1) < minMatches
         continue
     end
-    
+   
     preMatchedPoints  = prePoints(indexPairs(:,1),:);
     currMatchedPoints = currPoints(indexPairs(:,2),:);
     

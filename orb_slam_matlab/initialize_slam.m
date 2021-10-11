@@ -1,7 +1,7 @@
 %% Initalization of image folder
 addpath 'helperFunctions' 'initialization_steps' 'groundTruth'
 % imageFolder = '/Users/jona/sofa/build/screenshots/';
-% imageFolder = '/Users/jona/sofa_20.12/build_20.12/install/screenshots/';
+% imageFolder = '/Users/schuele/sofa_20.12/build_20.12/install/screenshots/';
 imagePrefix = 'RecordedCameraPython_';
 imageSequence = [imageFolder, imagePrefix];
 % imds = imageDatastore(firstFile);
@@ -9,7 +9,6 @@ imageSequence = [imageFolder, imagePrefix];
 
 % Test
 % numberOfInitialImages = 50;
-% initIm = 1;
 % Inspect the first image
 currFrameIdx = initIm;
 % currI = readimage(imds, currFrameIdx);

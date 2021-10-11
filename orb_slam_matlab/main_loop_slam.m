@@ -73,7 +73,6 @@ if currKeyFrameId == 3
 
 % Check loop closure after some key frames have been created    
 elseif currKeyFrameId > 20
-
     % Minimum number of feature matches of loop edges
     loopEdgeNumMatches = 50;
 
@@ -88,7 +87,6 @@ elseif currKeyFrameId > 20
             currFeatures, currPoints, intrinsics, scaleFactor, loopEdgeNumMatches);
     end
 end
-
 % If no loop closure is detected, add the image into the database
 if ~isLoopClosed
     currds = imageDatastore(sprintf('%s%08d.png',imageSequence,currFrameIdx));

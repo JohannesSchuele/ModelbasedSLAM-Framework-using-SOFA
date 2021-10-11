@@ -1,8 +1,7 @@
-%% Compare sofa ground truth with slam trajectory
+%% Compare sofa ground truth with reconstructed slam trajectory
 
 save('groundTruth/sofaGroundTruth.mat',...
     'sofaGroundTruth_trans','sofaGroundTruth_rot');
- 
 % Plot the actual camera trajectory 
 tweaked_plotActualTrajectory(mapPlot, sofaGroundTruth_trans, optimizedPoses);
 

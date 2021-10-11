@@ -1,7 +1,6 @@
 %% Initalization of image folder
 clear all; close all;
 addpath 'helperFunctions'
-% imageFolder   = '/Users/jona/sofa/build/screenshots/';
 imageFolder = 'example/sequence';
 imds          = imageDatastore(imageFolder);
 

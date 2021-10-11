@@ -18,11 +18,9 @@ f = double(viewerHeight) / 1200 * 1.448882146816558e+03;
 focalLength = [f f];
 %% Load camera intrinsics
 intrinsics = cameraIntrinsics(focalLength, principalPoint, imageSize);
-
 %% Start of map initialization
 % Set random seed for reproducibility
 rng(0);
-
 % Detect and extract ORB features
 scaleFactor = 1.2;
 numLevels   = 8;
@@ -30,7 +28,6 @@ numLevels   = 8;
 
 currFrameIdx = currFrameIdx + 1;
 firstI       = currI; % Preserve the first frame 
-
 isMapInitialized  = false;
 
 
