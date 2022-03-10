@@ -12,7 +12,7 @@ nav:
         - 'EngineORB': 'api/orb.md'
         - 'Plotting with pyqtgraph': 'api/plotter.md'
         - 'Feature Graph': 'api/feature_graph.md'
-repo_url: https://github.tik.uni-stuttgart.de/JHaag/Model_based_SLAM
+repo_url: https://github.com/JohannesSchuele/ModelbasedSLAM-Framework-using-SOFA
 edit_uri: edit/main/docs
 site_author: Jonathan Haag
 use_directory_urls : false
